@@ -6,14 +6,13 @@
 * the source
 * 
 * @author: La Manh Tu
-* @link: https://github.com/maruthedev/MyPersonalWidget
 */
 
 
 let myWidget = new ListWidget();
 const API = "https://api.imgflip.com/get_memes";
 const errors = [
-  "err: there's an error with the Request progress"
+  "err1: Could not load memes. Please check your internet connection!"
 ];
 let informations = {
   "author":iMadeThisStupidStuff(),
@@ -21,7 +20,7 @@ let informations = {
   "status":whatTimeIsIt(), 
   "battery":getBattery(),
   "note":thisIsAFuckingNote(),
-  "memeImg": await memeImg()
+  "memeImg": await memeImgUrl()
 };
 
 function iMadeThisStupidStuff(){
@@ -50,10 +49,15 @@ function thisIsAFuckingNote(){
   return "🌆 | random meme kekeke :D"
 }
 
-async function memeImg(){
-  let req = await new Request(API).loadJSON();
-  let img = await new Request(req.data.memes[randomNumber()].url).loadImage();
-  return img;
+async function memeImgUrl(){
+  let req = await new Request(API).loadJSON()
+  .then(json => new Request(json.data.memes[randomNumber()].url))
+  .then(img => img)
+  .catch(err => {
+    let errTxt = myWidget.addText(errors[0]);
+    errTxt.textColor = Color.red();
+    return null;
+  })
 }
 
 function randomNumber(){
@@ -75,7 +79,7 @@ async function setup(){
   batteryTxt.textColor = Color.yellow();
   fknNoteTxt.textColor = Color.green();
   
-  let memeImg = await myWidget.addImage(informations.memeImg).catch(err => {console.error(errors[0])});
+  let memeImg = await myWidget.addImage(informations.memeImg);
   
   Script.setWidget(myWidget);
 }
@@ -83,3 +87,4 @@ async function setup(){
 setup();
 Script.complete();
 myWidget.presentLarge();
+
