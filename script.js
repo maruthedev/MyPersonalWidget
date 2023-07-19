@@ -51,13 +51,14 @@ function thisIsAFuckingNote(){
 
 async function memeImgUrl(){
   let req = await new Request(API).loadJSON()
-  .then(json => new Request(json.data.memes[randomNumber()].url))
+  .then(json => new Request(json.data.memes[randomNumber()].url).loadImage())
   .then(img => img)
   .catch(err => {
     let errTxt = myWidget.addText(errors[0]);
     errTxt.textColor = Color.red();
     return null;
-  })
+  });
+  return req;
 }
 
 function randomNumber(){
@@ -84,7 +85,6 @@ async function setup(){
   Script.setWidget(myWidget);
 }
 
-setup();
+setup().catch(err => console.error(err));
 Script.complete();
 myWidget.presentLarge();
-
